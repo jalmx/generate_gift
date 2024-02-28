@@ -1,21 +1,19 @@
-import json 
+import json
 from pathlib import Path
 from sys import argv
 from os import path
+import random
 
 
 HELP = """
 How to use:
 
-    ggift <path_src_questions>.txt 
-    ggift <path_src_questions>.txt <random_answer>.json
+    ggift <path_src_questions>.txt prefix_question
+    ggift <path_src_questions>.txt prefix_question <random_answer>.json
 
-    ggift exam_p1.txt
-    ggift exam_p1.txt  random.json
+    ggift exam_p1.txt "P2_"
+    ggift exam_p1.txt "P2_" random.json
 """
-
-def get_bank_answers(path: Path) -> list[str]:
-    pass
 
 
 def _clear_sentence(question: str) -> str:
@@ -35,25 +33,77 @@ def _clear_sentence(question: str) -> str:
     return question.strip()
 
 
-def _is_true_question(answer: str):
-    return "TRUE" if _clear_sentence(answer).upper() == "Verdadero".upper() else "FALSE"
-
-
-def parse_question_gift(
-    txt, answer: str, number=8000, name_question="question", db_answer=None
-):
-
-    answer = _is_true_question(answer=answer)
-
+def _generate_txt_questions_base(
+    txt: str, answer: str, number: int, name_question="question"
+) -> str:
     txt_parse = (
         f'// question: {number}  name: {name_question}\n::{name_question}::[html]<p dir\="ltr" style\="text-align\: left;">{_clear_sentence(txt)}<br></p>'
         + "{"
         + answer
         + "}"
     )
-
-    # print(f"The answer parsed: {txt_parse}")
     return txt_parse
+
+
+def _generate_answers(answer: str, answers_wrong: list):
+
+    answer_ok = f'\n\t=<p dir\="ltr" style\="text-align\: left;">{_clear_sentence( answer)}<br></p>\n'
+
+    answer_final = answer_ok
+
+    for answer_wrong in answers_wrong:
+
+        answer_final += f'\t~<p dir\="ltr" style\="text-align\: left;">{_clear_sentence(answer_wrong)}<br></p>\n'
+
+    return answer_final
+
+
+def _generate_question_multi(
+    txt: str, answer: str, number: int, wrong_answer: list, name_question="question"
+) -> str:
+    answer = _generate_answers(answer=answer, answers_wrong=wrong_answer)
+
+    return _generate_txt_questions_base(
+        txt=txt, answer=answer, number=number, name_question=name_question
+    )
+
+
+def _is_true_question(answer: str):
+    return "TRUE" if _clear_sentence(answer).upper() == "Verdadero".upper() else "FALSE"
+
+
+def _generate_question_bool(
+    txt: str, answer: str, number: int, name_question="question"
+) -> str:
+    answer = _is_true_question(answer=answer)
+
+    return _generate_txt_questions_base(
+        txt=txt, answer=answer, number=number, name_question=name_question
+    )
+
+
+def parse_question_gift(
+    txt: str,
+    answer: str,
+    number: int,
+    number_raw_question: int,
+    wrong_answer: dict | None,
+    name_question="question",
+):
+
+    if wrong_answer and wrong_answer.get(str(number_raw_question)):
+        return _generate_question_multi(
+            txt=txt,
+            answer=answer,
+            number=number,
+            wrong_answer=wrong_answer.get(str(number_raw_question)),
+            name_question=name_question,
+        )
+    else:
+        txt = _generate_question_bool(
+            txt=txt, answer=answer, number=number, name_question=name_question
+        )
+        return txt
 
 
 def read_file(path_file):
@@ -64,7 +114,7 @@ def read_file(path_file):
 
 
 def template_header(name_course=None):
-    name_course = name_course or "6 SLM 602 24-24 Electrónica Industrial"
+    name_course = name_course or "WITHOUT COURSE"
 
     return f"""// question: 0  name: Switch category to $course$/top/Por defecto en {name_course}
 $CATEGORY: $course$/top/Por defecto en {name_course}"""
@@ -88,29 +138,32 @@ def _clear_questions(txt):
     return content
 
 
-def parse_questions(txt, type=None, name_question=None) -> list:
+def parse_questions(txt: str, prefix_question="Q0", data=dict | None) -> list:
     """Take the content from file with questions to generate a list with questions to load in a new file"""
+
     content_raw = _clear_questions(txt)
-    questions = (
-        []
-    )  # después sera un dict con las preguntas y respuestas, junto con las respuestas aleatorias
+    questions = []
+
     count = 0
-    number_base = (
-        8000  # este numero inventado con base al que viene en el archivo descargado
-    )
+
+    number_base = random.randint(800, 8000)
+    offset = random.randint(20, 50)
+
     count_question = 1
     while count < len(content_raw):
         question = content_raw[count]
         count += 1
         answer = content_raw[count]
         count += 1
-        name_question = f"P1_P{count_question}"
+        name_question = f"{prefix_question}_Q{count_question}"
         questions.append(
             parse_question_gift(
                 question,
                 answer,
-                number=(number_base + 30 + count_question),
+                number=(number_base + offset + count_question),
                 name_question=name_question,
+                wrong_answer=data,
+                number_raw_question=count_question,
             )
         )
         count_question += 1
@@ -119,12 +172,21 @@ def parse_questions(txt, type=None, name_question=None) -> list:
 
 
 def build_file(path, questions):
+    """Save the final file
+
+    Args:
+        path (str): path to save the file
+        questions (list): All questions to save in list
+    """
     with open(path, mode="w+") as f:
 
         for txt in questions:
             f.write(txt + "\n\n\r")
 
-def create_name(path_file: str)-> str:
+    print(f"File saved: {path}")
+
+
+def create_name(path_file: str) -> str:
     """Generare the name file will save gift.txt
 
     Args:
@@ -133,33 +195,34 @@ def create_name(path_file: str)-> str:
     Returns:
         str: new name for the file <name>_gift.txt
     """
-    name_full =path.basename(path_file)
+    name_full = path.basename(path_file)
     name = path.splitext(name_full)[0]
     name += "_gift.txt"
     return name
-    
 
 
 def main():
 
-    if len(argv) == 2 or len(argv) == 3:
+    if len(argv) >= 2 or len(argv) <= 4:
 
         json_answer_wrong = None
         path_question = Path(argv[1])
-        path_to_save = create_name(path_question)
-        
-        if len(argv) == 3:
-            json_path = argv[2]
+        name_gift_file = create_name(path_question)
+
+        prefix_question = argv[2]
+
+        if len(argv) == 4:
+            json_path = argv[3]
             with open(json_path, mode="r") as f:
                 json_answer_wrong = json.load(f)
-                print(json_answer_wrong)
 
-        exit(0)
         text = read_file(path_question)
-        questions = parse_questions(text)
+        questions = parse_questions(
+            text, prefix_question=prefix_question, data=json_answer_wrong
+        )
         questions.insert(0, template_header())
 
-        build_file(path_to_save, questions)
+        build_file(name_gift_file, questions)
     else:
         # TODO: agregar el help
         print("ERROR")

@@ -9,7 +9,7 @@ Examen Parcial 1 Electrónica Industrial
 2. contenido de la pregunta 2
    - Verdadero
 3. contenido de la pregunta 3
-   1. VERDADERO
+   1. FALSO
 4. contenido de pregunta 4
    - Respuesta correcta de la pregunta
 5. contenido de pregunta 5
@@ -17,7 +17,7 @@ Examen Parcial 1 Electrónica Industrial
 6. contenido de pregunta 6
    Respuesta correcta de la pregunta 6
 7. contenido de la pregunta 7
-   1. VERDADERO
+   1. falso
 8. contenido de la pregunta 8
    1. VERDADERO
 9. contenido de pregunta 9
