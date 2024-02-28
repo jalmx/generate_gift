@@ -1,3 +1,4 @@
+import json 
 from pathlib import Path
 from sys import argv
 from os import path
@@ -118,7 +119,6 @@ def parse_questions(txt, type=None, name_question=None) -> list:
 
 
 def build_file(path, questions):
-    # print(questions)
     with open(path, mode="w+") as f:
 
         for txt in questions:
@@ -144,9 +144,17 @@ def main():
 
     if len(argv) == 2 or len(argv) == 3:
 
+        json_answer_wrong = None
         path_question = Path(argv[1])
         path_to_save = create_name(path_question)
+        
+        if len(argv) == 3:
+            json_path = argv[2]
+            with open(json_path, mode="r") as f:
+                json_answer_wrong = json.load(f)
+                print(json_answer_wrong)
 
+        exit(0)
         text = read_file(path_question)
         questions = parse_questions(text)
         questions.insert(0, template_header())

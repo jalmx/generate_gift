@@ -1,0 +1,24 @@
+
+
+// question: 958  name: PREGUNTA_TEST_1
+::PREGUNTA_TEST_1::[html]<p dir\="ltr" style\="text-align\: left;">PREGUNTA COMPLETA 1<br></p>{
+	=<p dir\="ltr" style\="text-align\: left;">RESPUESTA </span><br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+}
+
+
+// question: 982  name: PREGUNTA_TEST_2
+::PREGUNTA_TEST_2::[html]<p dir\="ltr" style\="text-align\: left;">PREGUNTA COMPLETA 2<br></p>{
+	=<p dir\="ltr" style\="text-align\: left;">RESPUESTA </span><br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+}
+
+
+// question: 911  name: pregunta_test3
+::pregunta_test3::[html]<p dir\="ltr" style\="text-align\: left;">PREGUNTA COMPLETA 3<br></p>{
+	=<p dir\="ltr" style\="text-align\: left;">RESPUESTA </span><br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+	~<p dir\="ltr" style\="text-align\: left;">RESPUESTA INCORRECTA<br></p>
+}
