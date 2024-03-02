@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import json
 from pathlib import Path
 from sys import argv
@@ -203,30 +205,41 @@ def create_name(path_file: str) -> str:
 
 def main():
 
-    if len(argv) >= 2 or len(argv) <= 4:
+    try:
+        if len(argv) == 1:
+            print("ERROR")
+            print(HELP)
+            
+        elif argv[1] == "-h" or argv[1] == "--help":
+            print("help:")
+            print(HELP)
+            exit(0)
+            return
 
-        json_answer_wrong = None
-        path_question = Path(argv[1])
-        name_gift_file = create_name(path_question)
+        elif len(argv) >= 2 or len(argv) <= 4:
+            json_answer_wrong = None
+            path_question = Path(argv[1])
+            name_gift_file = create_name(path_question)
 
-        prefix_question = argv[2]
+            prefix_question = argv[2]
 
-        if len(argv) == 4:
-            json_path = argv[3]
-            with open(json_path, mode="r") as f:
-                json_answer_wrong = json.load(f)
+            if len(argv) == 4:
+                json_path = argv[3]
+                with open(json_path, mode="r") as f:
+                    json_answer_wrong = json.load(f)
 
-        text = read_file(path_question)
-        questions = parse_questions(
-            text, prefix_question=prefix_question, data=json_answer_wrong
-        )
-        questions.insert(0, template_header())
+            text = read_file(path_question)
+            questions = parse_questions(
+                text, prefix_question=prefix_question, data=json_answer_wrong
+            )
+            questions.insert(0, template_header(name_gift_file))
 
-        build_file(name_gift_file, questions)
-    else:
-        # TODO: agregar el help
-        print("ERROR")
-        print(HELP)
+            build_file(name_gift_file, questions)
+        else:
+            print("ERROR")
+            print(HELP)
+    except:
+        pass
 
 
 if __name__ == "__main__":
