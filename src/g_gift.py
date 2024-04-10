@@ -17,6 +17,7 @@ How to use:
     ggift exam_p1.txt "P2_" random.json
 """
 
+escape = r'\='
 
 def _clear_sentence(question: str) -> str:
     """clear the question if contain number to start que sentence
@@ -39,7 +40,7 @@ def _generate_txt_questions_base(
     txt: str, answer: str, number: int, name_question="question"
 ) -> str:
     txt_parse = (
-        f'// question: {number}  name: {name_question}\n::{name_question}::[html]<p dir\="ltr" style\="text-align\: left;">{_clear_sentence(txt)}<br></p>'
+        f'// question: {number}  name: {name_question}\n::{name_question}::[html]<p dir{escape}"ltr" style{escape}"text-align\\: left;">{_clear_sentence(txt)}<br></p>'
         + "{"
         + answer
         + "}"
@@ -49,13 +50,13 @@ def _generate_txt_questions_base(
 
 def _generate_answers(answer: str, answers_wrong: list):
 
-    answer_ok = f'\n\t=<p dir\="ltr" style\="text-align\: left;">{_clear_sentence( answer)}<br></p>\n'
+    answer_ok = f'\n\t=<p dir{escape}"ltr" style{escape}"text-align\\: left;">{_clear_sentence( answer)}<br></p>\n'
 
     answer_final = answer_ok
 
     for answer_wrong in answers_wrong:
 
-        answer_final += f'\t~<p dir\="ltr" style\="text-align\: left;">{_clear_sentence(answer_wrong)}<br></p>\n'
+        answer_final += f'\t~<p dir{escape}"ltr" style{escape}"text-align\\: left;">{_clear_sentence(answer_wrong)}<br></p>\n'
 
     return answer_final
 
@@ -214,14 +215,13 @@ def main():
             print("help:")
             print(HELP)
             exit(0)
-            return
 
         elif len(argv) >= 2 or len(argv) <= 4:
             json_answer_wrong = None
             path_question = Path(argv[1])
             name_gift_file = create_name(path_question)
-
-            prefix_question = argv[2]
+            print(len(argv))
+            prefix_question = argv[2] if len(argv) > 2  else "Q"
 
             if len(argv) == 4:
                 json_path = argv[3]
